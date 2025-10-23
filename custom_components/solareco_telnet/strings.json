@@ -1,0 +1,62 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "SolarEco Telnet Setup",
+                "description": "Configure your SolarEco MPPT regulator",
+                "data": {
+                    "host": "Host IP address",
+                    "port": "Port",
+                    "poll_interval": "Poll interval (seconds)",
+                    "timeout": "Connection timeout (seconds)"
+                }
+            }
+        },
+        "error": {
+            "cannot_connect": "Failed to connect to the device. Please check the IP address and port."
+        },
+        "abort": {
+            "already_configured": "This device is already configured"
+        }
+    },
+    "entity": {
+        "sensor": {
+            "relay": {
+                "name": "Relay"
+            },
+            "fan": {
+                "name": "Fan"
+            },
+            "required_voltage": {
+                "name": "Required voltage"
+            },
+            "voltage": {
+                "name": "Voltage"
+            },
+            "current": {
+                "name": "Current"
+            },
+            "power": {
+                "name": "Power"
+            },
+            "frequency": {
+                "name": "Frequency"
+            },
+            "cooler_temperature": {
+                "name": "Cooler temperature"
+            },
+            "boiler_temperature": {
+                "name": "Boiler temperature"
+            },
+            "pulse_width": {
+                "name": "Pulse width"
+            },
+            "total_energy": {
+                "name": "Total energy"
+            },
+            "day_energy": {
+                "name": "Day energy"
+            }
+        }
+    }
+}

@@ -1,0 +1,62 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Nastavení SolarEco Telnet",
+                "description": "Nakonfigurujte svůj MPPT regulátor SolarEco",
+                "data": {
+                    "host": "IP adresa zařízení",
+                    "port": "Port",
+                    "poll_interval": "Interval dotazování (sekundy)",
+                    "timeout": "Timeout připojení (sekundy)"
+                }
+            }
+        },
+        "error": {
+            "cannot_connect": "Nepodařilo se připojit k zařízení. Zkontrolujte prosím IP adresu a port."
+        },
+        "abort": {
+            "already_configured": "Toto zařízení je již nakonfigurováno"
+        }
+    },
+    "entity": {
+        "sensor": {
+            "relay": {
+                "name": "Relé"
+            },
+            "fan": {
+                "name": "Ventilátor"
+            },
+            "required_voltage": {
+                "name": "Požadované napětí"
+            },
+            "voltage": {
+                "name": "Napětí"
+            },
+            "current": {
+                "name": "Proud"
+            },
+            "power": {
+                "name": "Výkon"
+            },
+            "frequency": {
+                "name": "Frekvence"
+            },
+            "cooler_temperature": {
+                "name": "Teplota chladiče"
+            },
+            "boiler_temperature": {
+                "name": "Teplota bojleru"
+            },
+            "pulse_width": {
+                "name": "Šířka impulsu"
+            },
+            "total_energy": {
+                "name": "Celková energie"
+            },
+            "day_energy": {
+                "name": "Denní energie"
+            }
+        }
+    }
+}
