@@ -17,6 +17,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema({
     vol.Required("port", default=23): int,
     vol.Optional("poll_interval", default=5): int,
     vol.Optional("timeout", default=10): int,
+    vol.Optional("pause_at_night", default=True): bool,
 })
 
 
