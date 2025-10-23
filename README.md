@@ -33,10 +33,11 @@ Děkujeme původním autorům za vytvoření základu této integrace!
 - **Teplota chladiče (Cooler Temperature)** - Hlásí teplotu chladiče
 - **Teplota bojleru (Boiler Temperature)** - Hlásí teplotu bojleru
 - **Denní energie (Day Energy)** - Monitoruje denní výrobu energie
-- **Celková energie (Total Energy)** - Celková vyrobená energie
 - **Relé (Relay)** - Stav relé regulátoru
 - **Šířka impulsu (Pulse Width)** - Šířka PWM impulsu
 - **Ventilátor (Fan)** - Stav ventilátoru
+- **Požadované napětí (Required Voltage)** - Cílové napětí regulátoru
+- **Frekvence (Frequency)** - PWM frekvence
 
 ## Instalace
 
@@ -98,10 +99,32 @@ Po úspěšné instalaci a konfiguraci budete mít k dispozici entity jako:
 - `sensor.solareco_cooler_temperature` - Teplota chladiče
 - `sensor.solareco_boiler_temperature` - Teplota bojleru
 - `sensor.solareco_day_energy` - Denní energie
-- `sensor.solareco_total_energy` - Celková energie
-- A další...
+- `sensor.solareco_relay` - Stav relé
+- `sensor.solareco_fan` - Stav ventilátoru
+- `sensor.solareco_pulse_width` - Šířka PWM impulsu
+- `sensor.solareco_frequency` - PWM frekvence
+- `sensor.solareco_required_voltage` - Požadované napětí
 
 ## Odstraňování problémů
+
+### Integrace se nezobrazuje v seznamu integrací
+
+1. **Zkontrolujte správnost instalace:**
+   ```
+   /config/custom_components/solareco_telnet/
+   ├── __init__.py
+   ├── manifest.json
+   ├── config_flow.py
+   ├── sensor.py
+   ├── strings.json
+   └── translations/
+       ├── en.json
+       └── cs.json
+   ```
+
+2. **Restartujte Home Assistant**
+3. **Vyprázdněte cache prohlížeče** (Ctrl+F5)
+4. **Zkontrolujte logy:** Nastavení → Systém → Logy, hledejte chyby týkající se `solareco_telnet`
 
 ### Integrace se nemůže připojit k zařízení
 
