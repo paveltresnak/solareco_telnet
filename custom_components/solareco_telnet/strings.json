@@ -53,9 +53,6 @@
             "pulse_width": {
                 "name": "Pulse width"
             },
-            "total_energy": {
-                "name": "Total energy"
-            },
             "day_energy": {
                 "name": "Day energy"
             }
