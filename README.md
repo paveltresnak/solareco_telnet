@@ -80,6 +80,7 @@ Děkujeme původním autorům za vytvoření základu této integrace!
    - **Port** - Port pro telnet připojení (výchozí: 23)
    - **Interval dotazování** - Jak často se mají data načítat v sekundách (výchozí: 5)
    - **Timeout** - Časový limit pro připojení v sekundách (výchozí: 10)
+   - **Pozastavit dotazování v noci** - Automaticky přestane dotazovat po západu slunce (výchozí: zapnuto, vyžaduje nakonfigurovanou lokaci)
 5. Klikněte na **ODESLAT**
 
 Integrace se automaticky připojí k zařízení a vytvoří všechny dostupné senzory.
@@ -142,6 +143,32 @@ Po úspěšné instalaci a konfiguraci budete mít k dispozici entity jako:
 - Zkontrolujte logy Home Assistantu v **Nastavení** → **Systém** → **Logy**
 - Po třech po sobě jdoucích neúspěšných pokusech o připojení jsou senzory označeny jako nedostupné
 - Zkontrolujte síťové připojení k zařízení
+- **V noci jsou entity automaticky nedostupné** - to je normální chování, protože regulátor je vypnutý
+
+### Noční režim
+
+Integrace nabízí volitelnou funkci automatického pozastavení dotazování v noci:
+
+#### Jak aktivovat:
+1. **Nakonfigurujte lokaci** v Home Assistantu: **Nastavení → Systém → Obecné** (nastavte zeměpisnou šířku a délku)
+2. **Zapněte "Pozastavit dotazování v noci"** při přidávání integrace (výchozí: zapnuto)
+
+#### Jak to funguje:
+- Používá vestavěnou entitu `sun.sun` v Home Assistantu
+- Když je slunce pod obzorem, přestane dotazovat zařízení
+- Při východu slunce automaticky obnoví dotazování
+
+#### Co když nemám nakonfigurovanou lokaci?
+Pokud lokace není nastavena nebo nechcete noční režim:
+1. Při přidávání integrace **vypněte** "Pozastavit dotazování v noci"
+2. Integrace bude dotazovat nepřetržitě
+3. V logách se zobrazí varování, že `sun.sun` není k dispozici
+
+#### Výhody nočního režimu:
+- ✅ **Žádné chybové zprávy v noci** - nedochází k pokusům o připojení k vypnutému regulátoru
+- ✅ **Úspora zdrojů** - neprobíhají zbytečné telnet pokusy
+- ✅ **Čisté logy** - bez warningů o neúspěšných připojeních
+- ✅ **Automatické** - nevyžaduje manuální zásah
 
 ### Změna konfigurace
 
@@ -155,10 +182,10 @@ Pro změnu konfigurace (např. IP adresy nebo intervalu):
 ## Technické informace
 
 - **Doména:** `solareco_telnet`
-- **Verze:** 2.0.0
 - **IoT třída:** `local_polling`
 - **Platforma:** sensor
 - **Komunikační protokol:** Telnet (TCP port 23)
+- **Verze:** Viz [Releases](https://github.com/paveltresnak/solareco_telnet/releases)
 
 ## Změny oproti původní verzi
 
@@ -171,6 +198,7 @@ Pro změnu konfigurace (např. IP adresy nebo intervalu):
 - ✅ Snadnější instalace a správa
 - ✅ HACS kompatibilita
 - ✅ Lepší error handling a logování
+- ✅ Automatický noční režim (žádné dotazování po západu slunce)
 
 **Poznámka:** Pokud používáte původní integraci `solareco`, budete muset po instalaci této verze zařízení přidat znovu přes UI.
 
