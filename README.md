@@ -151,7 +151,7 @@ Pro změnu konfigurace (např. IP adresy nebo intervalu):
 ## Technické informace
 
 - **Doména:** `solareco_telnet`
-- **Verze:** 2.0.0
+- **Verze:** 2.0.1
 - **IoT třída:** `local_polling`
 - **Platforma:** sensor
 - **Komunikační protokol:** Telnet (TCP port 23)
