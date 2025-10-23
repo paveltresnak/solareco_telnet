@@ -37,7 +37,7 @@ async def validate_connection(hass: HomeAssistant, data: dict) -> dict:
         _LOGGER.error("Unexpected error: %s", err)
         raise CannotConnect from err
 
-    return {"title": f"SolarEco ({host})"}
+    return {"title": f"SolarEco Telnet ({host})"}
 
 
 def _test_connection(host: str, port: int, timeout: int) -> None:
