@@ -13,7 +13,8 @@
             }
         },
         "error": {
-            "cannot_connect": "Nepodařilo se připojit k zařízení. Zkontrolujte prosím IP adresu a port."
+            "cannot_connect": "Nepodařilo se připojit k zařízení. Zkontrolujte prosím IP adresu a port.",
+            "unknown": "Došlo k neočekávané chybě"
         },
         "abort": {
             "already_configured": "Toto zařízení je již nakonfigurováno"
