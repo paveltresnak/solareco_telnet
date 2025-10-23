@@ -85,7 +85,8 @@ async def async_setup_entry(
         entry.entry_id,
         config['host'],
         config['port'],
-        config.get('timeout', 10)
+        config.get('timeout', 10),
+        config.get('pause_at_night', True)
     )
     
     # Do first update
@@ -96,9 +97,27 @@ async def async_setup_entry(
     
     async def async_update(now):
         """Update sensor data only when sun is above horizon."""
+        # Check if pause at night is enabled
+        if not config.get('pause_at_night', True):
+            # Night pause disabled, always update
+            await hass.async_add_executor_job(sensor_connector.update)
+            return
+            
         # Check if sun entity exists
         sun_state = hass.states.get('sun.sun')
-        if sun_state and sun_state.state == 'below_horizon':
+        if sun_state is None:
+            # Sun entity not available, log warning once and continue updating
+            if not hasattr(async_update, '_sun_warning_logged'):
+                _LOGGER.warning(
+                    "Sun entity (sun.sun) not available. Night mode disabled. "
+                    "Configure your location in Settings -> System -> General to enable night mode, "
+                    "or disable 'Pause at night' option when reconfiguring this integration."
+                )
+                async_update._sun_warning_logged = True
+            await hass.async_add_executor_job(sensor_connector.update)
+            return
+        
+        if sun_state.state == 'below_horizon':
             _LOGGER.debug("Sun is below horizon, skipping update")
             sensor_connector.set_night_mode(True)
             return
@@ -195,19 +214,37 @@ class SolarecoSensor(SensorEntity):
 class SensorConnector:
     """Class to manage connection to SolarEco device."""
 
-    def __init__(self, hass, entry_id, solareco_host, solareco_port, timeout=10):
+    def __init__(self, hass, entry_id, solareco_host, solareco_port, timeout=10, pause_at_night=True):
         """Initialize the connector."""
         self.hass = hass
         self.entry_id = entry_id
         self.solareco_host = solareco_host
         self.solareco_port = solareco_port
         self.timeout = timeout
+        self.pause_at_night = pause_at_night
         self.data = {sensor.name: None for sensor in SENSORS}
         self.available = False
         self._consecutive_errors = 0
+        self._night_mode = False
+
+    def set_night_mode(self, night_mode: bool):
+        """Set night mode (don't try to connect when sun is down)."""
+        if night_mode != self._night_mode:
+            self._night_mode = night_mode
+            if night_mode:
+                _LOGGER.info("Entering night mode - updates paused until sunrise")
+                self.available = False
+                # Keep last known values but mark as unavailable
+                dispatcher_send(self.hass, f"{SIGNAL}_{self.entry_id}")
+            else:
+                _LOGGER.info("Exiting night mode - resuming updates")
 
     def update(self):
         """Fetch new state data."""
+        if self._night_mode:
+            _LOGGER.debug("In night mode, skipping update")
+            return
+            
         try:
             _LOGGER.debug(f"Connecting to SolarEco at {self.solareco_host}:{self.solareco_port}")
             
