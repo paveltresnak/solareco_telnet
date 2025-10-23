@@ -6,6 +6,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.exceptions import HomeAssistantError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,19 +30,29 @@ async def validate_connection(hass: HomeAssistant, data: dict) -> dict:
         await hass.async_add_executor_job(
             _test_connection, host, port, timeout
         )
-    except Exception as err:
+    except ConnectionError as err:
         _LOGGER.error("Connection test failed: %s", err)
-        raise
+        raise CannotConnect from err
+    except Exception as err:
+        _LOGGER.error("Unexpected error: %s", err)
+        raise CannotConnect from err
 
     return {"title": f"SolarEco ({host})"}
 
 
 def _test_connection(host: str, port: int, timeout: int) -> None:
     """Test connection to SolarEco device (blocking)."""
-    with telnetlib.Telnet(host, port, timeout=timeout) as tn:
-        data = tn.read_until(b'\n', timeout=timeout)
-        if not data:
-            raise Exception("No data received from device")
+    try:
+        with telnetlib.Telnet(host, port, timeout=timeout) as tn:
+            data = tn.read_until(b'\n', timeout=timeout)
+            if not data:
+                raise ConnectionError("No data received from device")
+    except Exception as err:
+        raise ConnectionError(f"Failed to connect: {err}") from err
+
+
+class CannotConnect(HomeAssistantError):
+    """Error to indicate we cannot connect."""
 
 
 class SolarEcoTelnetConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -56,8 +67,11 @@ class SolarEcoTelnetConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 info = await validate_connection(self.hass, user_input)
-            except Exception:
+            except CannotConnect:
                 errors["base"] = "cannot_connect"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
             else:
                 # Create unique ID based on host:port
                 await self.async_set_unique_id(f"{user_input['host']}:{user_input['port']}")
