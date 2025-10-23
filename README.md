@@ -49,8 +49,10 @@ Děkujeme původním autorům za vytvoření základu této integrace!
    - `config_flow.py`
    - `sensor.py`
    - `strings.json`
-   - `translations/` (celý adresář)
-3. Restartujte Home Assistant
+   - `translations/` (celý adresář s `en.json` a `cs.json`)
+3. **Restartujte Home Assistant** (důležité!)
+4. Vyprázdněte cache prohlížeče (Ctrl+F5 nebo Ctrl+Shift+R)
+5. Přejděte do **Nastavení → Zařízení a služby → Přidat integraci**
 
 ### Metoda 2: Přes HACS (pokud je integrace publikována)
 
