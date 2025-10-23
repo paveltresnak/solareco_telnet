@@ -131,9 +131,9 @@ class SolarecoSensor(SensorEntity):
         # Set device info
         self._attr_device_info = {
             "identifiers": {(DOMAIN, entry.entry_id)},
-            "name": f"SolarEco ({entry.data['host']})",
+            "name": f"SolarEco Telnet ({entry.data['host']})",
             "manufacturer": "SolarEco",
-            "model": "MPPT Regulator",
+            "model": "MPPT Regulator (Telnet)",
         }
 
     async def async_added_to_hass(self) -> None:
