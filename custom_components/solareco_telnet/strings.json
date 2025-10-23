@@ -13,7 +13,8 @@
             }
         },
         "error": {
-            "cannot_connect": "Failed to connect to the device. Please check the IP address and port."
+            "cannot_connect": "Failed to connect to the device. Please check the IP address and port.",
+            "unknown": "Unexpected error occurred"
         },
         "abort": {
             "already_configured": "This device is already configured"
