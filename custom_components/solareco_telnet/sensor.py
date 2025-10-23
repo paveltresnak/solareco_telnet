@@ -95,7 +95,15 @@ async def async_setup_entry(
     poll_interval = int(config.get('poll_interval', 5))
     
     async def async_update(now):
-        """Update sensor data."""
+        """Update sensor data only when sun is above horizon."""
+        # Check if sun entity exists
+        sun_state = hass.states.get('sun.sun')
+        if sun_state and sun_state.state == 'below_horizon':
+            _LOGGER.debug("Sun is below horizon, skipping update")
+            sensor_connector.set_night_mode(True)
+            return
+        
+        sensor_connector.set_night_mode(False)
         await hass.async_add_executor_job(sensor_connector.update)
     
     entry.async_on_unload(
