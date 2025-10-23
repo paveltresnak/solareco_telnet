@@ -8,7 +8,8 @@
                     "host": "IP adresa zařízení",
                     "port": "Port",
                     "poll_interval": "Interval dotazování (sekundy)",
-                    "timeout": "Timeout připojení (sekundy)"
+                    "timeout": "Timeout připojení (sekundy)",
+                    "pause_at_night": "Pozastavit dotazování v noci (vyžaduje sun integraci)"
                 }
             }
         },
