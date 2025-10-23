@@ -25,6 +25,10 @@ Děkujeme původním autorům za vytvoření základu této integrace!
 
 ## Vlastnosti
 
+- **Automatická detekce noci** - Integrace automaticky pozastaví dotazování, když slunce zapadne
+- **Inteligentní správa připojení** - Po 3 neúspěšných pokusech označí entity jako nedostupné
+- **Konfigurace přes UI** - Žádná potřeba upravovat configuration.yaml
+
 ### Podporované senzory
 
 - **Napětí (Voltage)** - Monitoruje napětí MPPT regulátoru
@@ -151,7 +155,7 @@ Pro změnu konfigurace (např. IP adresy nebo intervalu):
 ## Technické informace
 
 - **Doména:** `solareco_telnet`
-- **Verze:** 2.0.1
+- **Verze:** 2.0.0
 - **IoT třída:** `local_polling`
 - **Platforma:** sensor
 - **Komunikační protokol:** Telnet (TCP port 23)
