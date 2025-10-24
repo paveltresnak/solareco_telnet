@@ -21,6 +21,19 @@
             "already_configured": "This device is already configured"
         }
     },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Configure SolarEco Telnet",
+                "description": "Adjust integration settings",
+                "data": {
+                    "poll_interval": "Poll interval (seconds)",
+                    "timeout": "Connection timeout (seconds)",
+                    "pause_at_night": "Pause polling at night (requires sun integration)"
+                }
+            }
+        }
+    },
     "entity": {
         "sensor": {
             "relay": {
