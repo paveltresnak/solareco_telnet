@@ -7,7 +7,7 @@ Moderní integrace pro monitorování MPPT regulátoru SolarEco s konfigurací p
 Tento projekt je **nástupce** původní integrace [solareco-homeassistant](https://gitea.solareco.cz/test/solareco-homeassistant), která používala konfiguraci přes `configuration.yaml`. 
 
 **Původní autor:** SolarEco team  
-**Nástupce a modernizace:** Pavel Tresnak
+**Nástupce a modernizace:** Pavel Třešňák
 
 ### Hlavní vylepšení oproti originálu:
 - ✅ Konfigurace přes Home Assistant UI místo YAML
@@ -217,6 +217,6 @@ Tento projekt je open-source software.
 ## Autoři a poděkování
 
 - **Původní integrace:** [SolarEco team](https://gitea.solareco.cz/test/solareco-homeassistant)
-- **Modernizace a údržba:** Pavel Tresnak
+- **Modernizace a údržba:** Pavel Třešňák
 
 Děkuji původním autorům za vytvoření základu této integrace!
