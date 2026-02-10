@@ -1,6 +1,7 @@
 """SolarEco Telnet sensor platform."""
 import logging
 import telnetlib
+import time
 from datetime import timedelta
 import re
 
@@ -214,6 +215,12 @@ class SolarecoSensor(SensorEntity):
 class SensorConnector:
     """Class to manage connection to SolarEco device."""
 
+    # Backoff schedule: after 3 initial warnings, progressively wait longer
+    # before retrying. Values in seconds.
+    BACKOFF_SCHEDULE = [10, 30, 60, 120, 300]  # max 5 minutes between retries
+    # How often to log a reminder when in backoff (in seconds)
+    BACKOFF_LOG_INTERVAL = 300  # log at most once per 5 minutes
+
     def __init__(self, hass, entry_id, solareco_host, solareco_port, timeout=10, pause_at_night=True):
         """Initialize the connector."""
         self.hass = hass
@@ -226,6 +233,8 @@ class SensorConnector:
         self.available = False
         self._consecutive_errors = 0
         self._night_mode = False
+        self._backoff_until = 0  # timestamp until which we skip updates
+        self._last_error_log_time = 0  # timestamp of last error log
 
     def set_night_mode(self, night_mode: bool):
         """Set night mode (don't try to connect when sun is down)."""
@@ -234,17 +243,38 @@ class SensorConnector:
             if night_mode:
                 _LOGGER.info("Entering night mode - updates paused until sunrise")
                 self.available = False
+                self._consecutive_errors = 0
+                self._backoff_until = 0
                 # Keep last known values but mark as unavailable
                 dispatcher_send(self.hass, f"{SIGNAL}_{self.entry_id}")
             else:
                 _LOGGER.info("Exiting night mode - resuming updates")
+                self._consecutive_errors = 0
+                self._backoff_until = 0
+
+    def _get_backoff_seconds(self) -> int:
+        """Get the current backoff delay based on consecutive error count."""
+        if self._consecutive_errors <= 3:
+            return 0  # No backoff for first 3 attempts
+        # Index into backoff schedule (0-based after the first 3 errors)
+        idx = min(self._consecutive_errors - 4, len(self.BACKOFF_SCHEDULE) - 1)
+        return self.BACKOFF_SCHEDULE[idx]
 
     def update(self):
         """Fetch new state data."""
         if self._night_mode:
             _LOGGER.debug("In night mode, skipping update")
             return
-            
+
+        # Check if we're in a backoff period
+        now = time.monotonic()
+        if now < self._backoff_until:
+            _LOGGER.debug(
+                "In backoff period, skipping update (%.0f seconds remaining)",
+                self._backoff_until - now
+            )
+            return
+
         try:
             _LOGGER.debug(f"Connecting to SolarEco at {self.solareco_host}:{self.solareco_port}")
             
@@ -267,8 +297,15 @@ class SensorConnector:
                         _LOGGER.warning(f"Failed to parse {sensor.name}: {e}")
                         self.data[sensor.name] = None
                 
-                # Reset error counter on successful update
+                # Reset error counter and backoff on successful update
+                if self._consecutive_errors > 0:
+                    _LOGGER.info(
+                        "SolarEco connection restored after %d failed attempts",
+                        self._consecutive_errors
+                    )
                 self._consecutive_errors = 0
+                self._backoff_until = 0
+                self._last_error_log_time = 0
                 self.available = True
                 
                 # Notify sensors
@@ -278,13 +315,28 @@ class SensorConnector:
             self._consecutive_errors += 1
             
             if self._consecutive_errors <= 3:
-                _LOGGER.warning(f"Failed to connect to SolarEco (attempt {self._consecutive_errors}): {e}")
+                # First 3 attempts: warn on each one
+                _LOGGER.warning(
+                    "Failed to connect to SolarEco (attempt %d): %s",
+                    self._consecutive_errors, e
+                )
             else:
-                _LOGGER.error(f"Repeated connection failures to SolarEco ({self._consecutive_errors} times): {e}")
+                # After 3 failures: apply backoff and throttle logging
+                backoff_secs = self._get_backoff_seconds()
+                self._backoff_until = time.monotonic() + backoff_secs
+
+                # Log at most once per BACKOFF_LOG_INTERVAL
+                if (now - self._last_error_log_time) >= self.BACKOFF_LOG_INTERVAL:
+                    _LOGGER.warning(
+                        "SolarEco unreachable (%d consecutive failures). "
+                        "Next retry in %d seconds. Last error: %s",
+                        self._consecutive_errors, backoff_secs, e
+                    )
+                    self._last_error_log_time = now
             
             # Mark as unavailable after 3 consecutive errors
             if self._consecutive_errors >= 3:
                 self.available = False
                 
-            # Keep last known values but mark as stale
+            # Notify sensors about state change
             dispatcher_send(self.hass, f"{SIGNAL}_{self.entry_id}")
