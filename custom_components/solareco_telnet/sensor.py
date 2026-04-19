@@ -111,14 +111,6 @@ SENSORS: tuple[SolarEcoSensorDescription, ...] = (
         icon="mdi:pulse",
     ),
     SolarEcoSensorDescription(
-        key="total_energy",
-        translation_key="total_energy",
-        native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
-        device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        icon="mdi:lightning-bolt-circle",
-    ),
-    SolarEcoSensorDescription(
         key="day_energy",
         translation_key="day_energy",
         native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,

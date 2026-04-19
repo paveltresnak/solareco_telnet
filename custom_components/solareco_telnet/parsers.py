@@ -23,7 +23,6 @@ _RE_FREQ = re.compile(r"(\d+)Hz")
 _RE_COOLER = re.compile(r"(\d+)C")
 _RE_BOILER = re.compile(r"(\d+):\d+C")
 _RE_PULSE = re.compile(r"(\d+)us")
-_RE_TOTAL_ENERGY = re.compile(r"\d+kWh\s(\d+)Wh")
 _RE_DAY_ENERGY = re.compile(r"(\d+)Wh")
 
 
@@ -80,12 +79,6 @@ def parse_boiler_temperature(data: str) -> int | None:
 
 def parse_pulse_width(data: str) -> int | None:
     m = _RE_PULSE.search(data)
-    return int(m.group(1)) if m else None
-
-
-def parse_total_energy(data: str) -> int | None:
-    """Total energy — 'NNkWh MMWh' → MM (Wh part only)."""
-    m = _RE_TOTAL_ENERGY.search(data)
     return int(m.group(1)) if m else None
 
 

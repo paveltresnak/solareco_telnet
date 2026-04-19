@@ -34,7 +34,6 @@ PARSERS: dict[str, callable] = {
     "cooler_temperature": parsers.parse_cooler_temperature,
     "boiler_temperature": parsers.parse_boiler_temperature,
     "pulse_width": parsers.parse_pulse_width,
-    "total_energy": parsers.parse_total_energy,
     "day_energy": parsers.parse_day_energy,
 }
 
