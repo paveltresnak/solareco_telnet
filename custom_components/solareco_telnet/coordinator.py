@@ -45,6 +45,9 @@ class SolarEcoTelnetCoordinator(DataUpdateCoordinator[dict]):
     # before retrying. Values in seconds.
     BACKOFF_SCHEDULE = [10, 30, 60, 120, 300]
     BACKOFF_LOG_INTERVAL = 300  # log at most once per 5 min while backing off
+    # sun.sun may be unavailable for a few seconds at HA startup (integration
+    # load order race). Only log the warning after this many consecutive misses.
+    SUN_WARN_AFTER = 5
 
     def __init__(
         self,
@@ -70,6 +73,7 @@ class SolarEcoTelnetCoordinator(DataUpdateCoordinator[dict]):
         self._backoff_until = 0.0
         self._last_error_log_time = 0.0
         self._sun_warning_logged = False
+        self._sun_missing_count = 0      # how many consecutive polls had no sun.sun
         self._night_mode = False
 
     async def _async_update_data(self) -> dict:
@@ -152,14 +156,29 @@ class SolarEcoTelnetCoordinator(DataUpdateCoordinator[dict]):
         """Return True if sun is below horizon (and pause_at_night is enabled)."""
         sun = self.hass.states.get("sun.sun")
         if sun is None:
-            if not self._sun_warning_logged:
+            self._sun_missing_count += 1
+            if (
+                not self._sun_warning_logged
+                and self._sun_missing_count >= self.SUN_WARN_AFTER
+            ):
                 _LOGGER.warning(
-                    "sun.sun entity not available; night pause disabled. "
+                    "sun.sun entity not available after %d polls; night pause disabled. "
                     "Set your location in Settings → System → General, "
-                    "or disable 'Pause at night' in integration options."
+                    "or disable 'Pause at night' in integration options.",
+                    self._sun_missing_count,
                 )
                 self._sun_warning_logged = True
+            else:
+                _LOGGER.debug(
+                    "sun.sun not yet available (%d/%d polls)",
+                    self._sun_missing_count,
+                    self.SUN_WARN_AFTER,
+                )
             return False
+        # Sun available — reset counter + re-arm warning so later disappearance triggers again
+        if self._sun_missing_count > 0 or self._sun_warning_logged:
+            self._sun_missing_count = 0
+            self._sun_warning_logged = False
         if sun.state == "below_horizon":
             if not self._night_mode:
                 _LOGGER.info("Entering night mode — updates paused until sunrise")

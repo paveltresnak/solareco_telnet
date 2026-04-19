@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 CHANGELOG sestaven zpětně z GitHub releases 2025-10 až 2026-04.
 
+## [3.0.2] — 2026-04-19
+
+### Fixed
+- **Potlačen warning „sun.sun entity not available" během startu HA.** Při restartu se integrace načítají paralelně; `sun.sun` se občas objeví o sekundu později než solareco_telnet coordinator. Dřívější verze zalogovala WARNING ihned při první absenci. Nyní se warning objeví až po **5 po sobě jdoucích chybách** (asi 25 s při 5s poll intervalu) — to odpovídá reálnému config problému, ne startup race. Při úspěšném nálezu se čítač nuluje a warning se znovu „nabije" pro případ pozdějšího výpadku.
+
 ## [3.0.1] — 2026-04-19
 
 ### Fixed
