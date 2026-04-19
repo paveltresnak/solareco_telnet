@@ -184,8 +184,17 @@ Pro změnu konfigurace (např. IP adresy nebo intervalu):
 - **Doména:** `solareco_telnet`
 - **IoT třída:** `local_polling`
 - **Platforma:** sensor
-- **Komunikační protokol:** Telnet (TCP port 23)
-- **Verze:** Viz [Releases](https://github.com/paveltresnak/solareco_telnet/releases)
+- **Komunikační protokol:** TCP (port 23) — plně async přes `asyncio.open_connection()` od v3.0.0
+- **Verze:** Viz [Releases](https://github.com/paveltresnak/solareco_telnet/releases) + [CHANGELOG.md](CHANGELOG.md)
+
+### Architektura od v3.0.0
+
+- `asyncio.open_connection()` místo `telnetlib` (Python 3.13 ready — PEP 594)
+- `DataUpdateCoordinator` pattern (HA standard)
+- Precompiled regex parsery (`parsers.py`), `SensorEntityDescription` dataclasses
+- Backoff strategy (3 pokusy → 10/30/60/120/300 s) + pause_at_night zachované z v2.2.0
+
+Podrobná historie změn: [CHANGELOG.md](CHANGELOG.md).
 
 ## Změny oproti původní verzi
 
